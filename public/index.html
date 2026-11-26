@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#040d21" />
+  <title>GILONTRIP — Mobil Ilova</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+
+  <!-- 1. DASTUR OCHILISHI UCHUN KIRISH EKRANI -->
+  <section class="entry-gate" id="entryGate">
+    <div class="entry-card">
+      <div class="entry-brand">
+        <div class="entry-brand-badge"><i class="fa-solid fa-compass"></i> GILONTRIP</div>
+        <h1>Platformaga Kirish</h1>
+        <p>Dasturdan foydalanish uchun kiring yoki ro‘yxatdan o‘ting</p>
+      </div>
+
+      <div class="mode-switch">
+        <button type="button" class="mode-btn active" id="modeLoginBtn" onclick="setEntryMode('login')">Kirish</button>
+        <button type="button" class="mode-btn" id="modeRegBtn" onclick="setEntryMode('register')">Ro'yxatdan o'tish</button>
+      </div>
+
+      <div class="auth-notice hidden" id="authNoticeBox"></div>
+
+      <form id="entryLoginForm" onsubmit="submitEntryLogin(event)">
+        <input type="text" id="entryLoginUser" class="blue-input" placeholder="Login" oninput="clearAuthNotice()" required />
+        <input type="password" id="entryLoginPass" class="blue-input" placeholder="Parol" oninput="clearAuthNotice()" required />
+        <button type="submit" class="btn-blue" style="margin-top: 4px;">
+          <i class="fa-solid fa-right-to-bracket"></i> Dasturga kirish
+        </button>
+      </form>
+
+      <form id="entryRegForm" class="hidden" onsubmit="submitEntryRegister(event)">
+        <input type="text" id="entryRegName" class="blue-input" placeholder="Ism va familya" oninput="clearAuthNotice()" required />
+        <input type="text" id="entryRegLogin" class="blue-input" placeholder="Yangi login (bir martalik)" oninput="clearAuthNotice()" required />
+        <input type="password" id="entryRegPass" class="blue-input" placeholder="Parol" oninput="clearAuthNotice()" required />
+        <button type="submit" class="btn-gold" style="margin-top: 4px;">
+          <i class="fa-solid fa-user-plus"></i> Ro'yxatdan o'tish va kirish
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- 2. MIJOZLAR ILOVASI -->
+  <div class="app-shell" id="appShell">
+
+    <header class="app-header">
+      <div class="header-left">
+        <button class="icon-btn" onclick="toggleDrawer(true)" aria-label="Menyu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="brand-logo">
+          <span class="brand-logo-badge">GT</span>
+          <span>GILONTRIP</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn admin-lock-btn" onclick="openAdminModal()" title="Admin panel" aria-label="Admin panel">
+          <i class="fa-solid fa-shield-halved"></i>
+        </button>
+        <button class="icon-btn" onclick="logoutClient()" title="Chiqish" aria-label="Chiqish">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- CHAP TOMONDAGI MENYU -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer(false)"></div>
+    <aside class="drawer-menu" id="drawerMenu">
+      <div class="drawer-header">
+        <div class="brand-logo">
+          <span class="brand-logo-badge">GT</span> GILONTRIP
+        </div>
+        <button class="icon-btn" onclick="toggleDrawer(false)"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="drawer-user-pill">
+        <div style="font-size: 0.68rem; color: var(--blue-accent); font-weight:700;">RO'YXATDAN O'TGAN MIJOZ:</div>
+        <div style="font-size: 0.95rem; font-weight: 800; color: #ffffff;" id="drawerClientName">Mijoz</div>
+      </div>
+
+      <div class="drawer-section-title">Mijozlar menyusi</div>
+      <button class="drawer-item active" onclick="selectDrawerCategory('barchasi', this)">
+        <i class="fa-solid fa-border-all" style="color:var(--blue-accent);"></i> Barcha e'lonlar
+      </button>
+      <button class="drawer-item" onclick="selectDrawerCategory('dacha', this)">
+        <i class="fa-solid fa-house-chimney" style="color:var(--blue-accent);"></i> Dachalar
+      </button>
+      <button class="drawer-item" onclick="selectDrawerCategory('taksi', this)">
+        <i class="fa-solid fa-taxi" style="color:var(--blue-accent);"></i> Taksi xizmatlari
+      </button>
+      <button class="drawer-item" onclick="selectDrawerCategory('restoran', this)">
+        <i class="fa-solid fa-utensils" style="color:var(--blue-accent);"></i> Restoranlar
+      </button>
+      <button class="drawer-item" onclick="selectDrawerCategory('turistik', this)">
+        <i class="fa-solid fa-mountain-sun" style="color:var(--blue-accent);"></i> Turistik zonalar
+      </button>
+      <button class="drawer-item" onclick="selectDrawerTab('tabPayment', this)">
+        <i class="fa-solid fa-credit-card" style="color:var(--gold-accent);"></i> 1 Oylik To'lov
+      </button>
+    </aside>
+
+    <main class="app-main">
+      <section id="tabListings">
+        <input type="text" id="searchInput" class="blue-input" placeholder="E'lonlarni qidirish..." oninput="renderListings()" />
+        <div class="listings-container" id="listingsContainer"></div>
+      </section>
+
+      <section id="tabPayment" class="hidden">
+        <div class="client-card-box">
+          <h3 style="color:#ffffff; font-size:1.1rem; margin-bottom:6px;">1 Oylik Obuna To'lovi</h3>
+          <p style="font-size:0.8rem; color:var(--blue-muted); margin-bottom:12px;">Admin kartasiga to'lov qiling va tasdiqlash uchun yuboring.</p>
+
+          <div style="background:#040d21; border:1px solid var(--blue-accent); padding:10px; border-radius:8px; margin-bottom:12px;">
+            <div style="font-size:0.7rem; color:var(--blue-muted);">ADMIN KARTA RAQAMI</div>
+            <div style="font-size:1.15rem; font-weight:800; color:#ffffff;" id="displayCardNum">8600 5544 3322 1100</div>
+            <div style="font-size:0.8rem; color:var(--blue-accent);" id="displayCardOwner">Norboyev Nazarbek</div>
+          </div>
+
+          <form onsubmit="submitPayment(event)">
+            <input type="text" id="payName" class="blue-input" placeholder="Ism va familyangiz" required />
+            <input type="tel" id="payPhone" class="blue-input" placeholder="+998 90 123 45 67" required />
+            <button type="submit" class="btn-gold"><i class="fa-solid fa-check"></i> Kartaga to'lov qildim</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <nav class="app-bottom-bar" aria-label="Mijozlar menyusi">
+      <button class="bar-item active" id="bNavHome" onclick="switchTab('tabListings', this)">
+        <i class="fa-solid fa-house"></i>
+        <span>Bosh sahifa</span>
+      </button>
+      <button class="bar-item" onclick="toggleDrawer(true)">
+        <i class="fa-solid fa-bars"></i>
+        <span>Menyu</span>
+      </button>
+      <button class="bar-item add-btn-item" onclick="openAddModal()">
+        <i class="fa-solid fa-circle-plus"></i>
+        <span>E'lon +</span>
+      </button>
+      <button class="bar-item" id="bNavPay" onclick="switchTab('tabPayment', this)">
+        <i class="fa-solid fa-credit-card"></i>
+        <span>To'lov</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- E'LON QO'SHISH MODALI -->
+  <div class="mobile-modal" id="addModal">
+    <div class="modal-sheet">
+      <div class="sheet-header">
+        <h3 style="color:#ffffff; font-size:1.05rem;"><i class="fa-solid fa-camera" style="color:var(--blue-accent);"></i> Yangi E'lon Qo'shish</h3>
+        <button class="icon-btn" onclick="closeAddModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form onsubmit="saveNewListing(event)">
+        <select id="postCat" class="blue-select" required>
+          <option value="dacha">Dacha</option>
+          <option value="taksi">Taksi</option>
+          <option value="restoran">Restoran</option>
+          <option value="turistik">Turistik zona</option>
+        </select>
+
+        <input type="text" id="postTitle" class="blue-input" placeholder="Sarlavha" required />
+        <input type="text" id="postPrice" class="blue-input" placeholder="Narxi (masalan: 500,000 UZS)" required />
+
+        <div class="file-upload-box" id="uploadBox">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <p><strong>Rasm tanlash uchun bosing</strong></p>
+          <p style="font-size:0.7rem;">Kamera yoki galereyadan rasm yuklang</p>
+          <input type="file" id="postImageFile" class="file-input-hidden" accept="image/*" onchange="handleImageSelect(event)" />
+        </div>
+
+        <div class="image-preview-container" id="previewContainer">
+          <img id="imagePreview" src="" alt="Yuklangan rasm" />
+          <button type="button" class="remove-img-btn" onclick="removeSelectedImage()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <textarea id="postDesc" class="blue-textarea" rows="3" placeholder="Batafsil ma'lumot va aloqa raqami..." required></textarea>
+        <button type="submit" class="btn-blue"><i class="fa-solid fa-paper-plane"></i> E'lonni joylashtirish</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL MODALI -->
+  <div class="mobile-modal" id="adminModal">
+    <div class="modal-sheet">
+      <div class="sheet-header">
+        <h3 style="color:#ffffff; font-size:1.05rem;"><i class="fa-solid fa-shield-halved" style="color:var(--gold-accent);"></i> Admin Boshqaruv Markazi</h3>
+        <button class="icon-btn" onclick="closeAdminModal()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div id="adminLoginStep">
+        <form onsubmit="verifyAdminLogin(event)">
+          <input type="text" id="adminUserInput" class="blue-input" placeholder="Admin login (olmasbek)" required />
+          <input type="password" id="adminPassInput" class="blue-input" placeholder="Admin parol (78879009)" required />
+          <button type="submit" class="btn-blue"><i class="fa-solid fa-key"></i> Admin panelga kirish</button>
+        </form>
+      </div>
+
+      <div id="adminAreaStep" class="hidden">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:0.82rem; color:var(--blue-accent); font-weight:700;">Admin: olmasbek</span>
+          <button type="button" class="btn-danger-sm" onclick="lockAdminModal()">Chiqish</button>
+        </div>
+
+        <div class="admin-sub-title"><i class="fa-solid fa-credit-card"></i> 3. Admin Karta Sozlamalari</div>
+        <div style="background:#040d21; border:1px solid var(--blue-border); padding:10px; border-radius:8px; margin-bottom:12px;">
+          <input type="text" id="adminCardNumInput" class="blue-input" placeholder="Karta raqami (masalan: 8600...)" />
+          <input type="text" id="adminCardOwnerInput" class="blue-input" placeholder="Karta egasi (Ism Familya)" />
+          <button type="button" class="btn-blue" onclick="saveAdminCardDetails()"><i class="fa-solid fa-floppy-disk"></i> Kartani saqlash</button>
+        </div>
+
+        <div class="admin-sub-title"><i class="fa-solid fa-users"></i> 2. Foydalanuvchilar va To'lov Statusi</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ism Familya</th>
+                <th>To'lov</th>
+                <th>Boshqaruv</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersStatusBody"></tbody>
+          </table>
+        </div>
+
+        <div class="admin-sub-title"><i class="fa-solid fa-book"></i> 4. Hisob-Kitob Daftari</div>
+        <div style="background:#040d21; border:1px solid var(--blue-border); padding:10px; border-radius:8px; margin-bottom:12px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
+            <input type="text" id="ledgerTitle" class="blue-input" placeholder="Tavsif (Masalan: Dacha bron)" style="margin-bottom:0;" />
+            <input type="number" id="ledgerAmount" class="blue-input" placeholder="Summa (UZS)" style="margin-bottom:0;" />
+          </div>
+          <select id="ledgerType" class="blue-select" style="margin-bottom:6px;">
+            <option value="kirim">Kirim (+)</option>
+            <option value="chiqim">Chiqim (-)</option>
+          </select>
+          <button type="button" class="btn-gold" onclick="addLedgerEntry()"><i class="fa-solid fa-plus"></i> Daftarga yozish</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tavsif</th>
+                <th>Summa</th>
+                <th>Tur</th>
+              </tr>
+            </thead>
+            <tbody id="adminLedgerBody"></tbody>
+          </table>
+        </div>
+
+        <div class="admin-sub-title"><i class="fa-solid fa-money-bill-check"></i> To'lov So'rovlari</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ism</th>
+                <th>Telefon</th>
+                <th>Holat</th>
+                <th>Amal</th>
+              </tr>
+            </thead>
+            <tbody id="adminPaymentsBody"></tbody>
+          </table>
+        </div>
+
+        <div class="admin-sub-title"><i class="fa-solid fa-list-check"></i> Barcha E'lonlar</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tur</th>
+                <th>Sarlavha</th>
+                <th>O'chirish</th>
+              </tr>
+            </thead>
+            <tbody id="adminListingsBody"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
